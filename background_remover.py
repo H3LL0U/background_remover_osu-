@@ -91,7 +91,7 @@ def remove_backgrounds_fully(the_osu_directory_path =None ):
                 
                 
                     
-                    print(f"{i} removed")
-                    #os.remove(i)
+                    #print(f"{i} removed")
+                    os.remove(i)
 
 

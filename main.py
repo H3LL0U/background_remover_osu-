@@ -80,6 +80,7 @@ search_button.grid(column=2,row=1)
 #manual - search button
 def manual_search_func():
     osu_main_directory_var.set(filedialog.askdirectory(parent=root ,title="Select osu!/songs folder"))
+    
 manual_search_button = Button(possible_osu_directory_path_listbox_frame,text="Manual Search",command=manual_search_func)
 manual_search_button.grid(column=0,row=1)
 
