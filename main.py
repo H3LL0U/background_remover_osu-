@@ -1,5 +1,6 @@
-from background_remover import remove_backgrounds_fully, os , find_directories, filedialog
+from background_remover_functions import remove_backgrounds_fully, os , find_directories, filedialog , messagebox , get_background_images_paths
 from tkinter import *
+import tkinter.scrolledtext as scrolledtext
 #try to find an osu! directory location
 possible_directory = []
 possible_directory_generator = find_directories("C:/", "osu!\Songs")
@@ -16,7 +17,7 @@ def find_next_possible_location():
         possible_osu_directory_path_listbox.config(width= max((len(i) for i in possible_directory),default=1))
     except:
         search_button.grid_forget()
-        print("all the directories have been looped through")
+        log(["ALL THE DIRECTORIES ON YOUR COMPUTER HAVE BEEN CHECKED"])
 
 
     
@@ -25,6 +26,7 @@ def find_next_possible_location():
 
 
 root = Tk()
+root.resizable(False, False)
 root.geometry("500x500")
 root.title("Osu! background remover")
 
@@ -56,7 +58,7 @@ osu_main_directory_var.trace_add(mode="write",callback=adjust_width(osu_main_dir
 #create the Listbox with posible directories that the program has found
 possible_osu_directory_path_listbox_frame = Frame(main_frame)
 possible_osu_directory_path_listbox_frame.pack()
-possible_osu_directory_path_listbox = Listbox(possible_osu_directory_path_listbox_frame, height=len(possible_directory), width = max((len(i) for i in possible_directory),default=1))
+possible_osu_directory_path_listbox = Listbox(possible_osu_directory_path_listbox_frame, height=len(possible_directory), width = max((len(i) for i in possible_directory),default=1),)
 
 
 
@@ -64,11 +66,16 @@ possible_osu_directory_path_listbox = Listbox(possible_osu_directory_path_listbo
 
 #change the entry value to the one of a selected ellement of the listbox
 def auto_change_osu_path_entry(*ok):
+    
     try:
         osu_main_directory_var.set(possible_directory[possible_osu_directory_path_listbox.curselection()[0]])
     except:
         pass
-
+    try:
+        log(["PATHS TO BACKGROUNDS TO REMOVE ARE:", *get_background_images_paths(osu_main_directory_var.get(),False)])
+        
+    except Exception as error:
+        log([str(error)])
 possible_osu_directory_path_listbox.bind("<<ListboxSelect>>",auto_change_osu_path_entry)
 
 possible_osu_directory_path_listbox.grid(column=1,row=1)
@@ -79,22 +86,58 @@ search_button.grid(column=2,row=1)
 
 #manual - search button
 def manual_search_func():
-    osu_main_directory_var.set(filedialog.askdirectory(parent=root ,title="Select osu!/songs folder"))
-    
+    global possible_directory
+    try:
+        possible_directory_to_add = filedialog.askdirectory(parent=root ,title="Select osu!/Songs folder")
+        if possible_directory_to_add in possible_directory:
+            raise(Exception("SELECTED DIRECTORY ALREADY EXISTS IN THE LISTBOX"))
+        possible_directory.append(possible_directory_to_add)
+        possible_osu_directory_path_listbox.insert(END,possible_directory[-1])
+        log(["SELECTED DIRECTORY HAS BEEN ADDED:", possible_directory_to_add])
+        possible_osu_directory_path_listbox.config(width= min(max((len(i) for i in possible_directory),default=1),40))
+    except Exception as error:
+        log([str(error)])
 manual_search_button = Button(possible_osu_directory_path_listbox_frame,text="Manual Search",command=manual_search_func)
 manual_search_button.grid(column=0,row=1)
 
 
 #Create the confirm button
 
+#removesimages from osu!/Songs path is set correctly
 def remove_bg_confirm(var):
     def wrapper():
-        
-        remove_backgrounds_fully(var.get())
+        #log(["PATHS TO BACKGROUNDS TO REMOVE ARE:"])
+        #log(get_background_images_paths(var.get(),ask_user=False))
+        try:
+            
+            remove_backgrounds_fully(get_background_images_paths(var.get()))
+            log(["ALL THE BACKGROUND IMAGES HAVE BEEN REMOVED!"])
+        except Exception as error:
+            messagebox.showerror("error",error)
+            log([str(error)])
     return wrapper
 
 confirm_the_removal = Button(root,text="Confirm", command=remove_bg_confirm(osu_main_directory_var))
 confirm_the_removal.pack()
+
+#takes in a tuple and inserts it into the Log space 
+def log(text_to_add = []):
+    Log_textarea.config(state=NORMAL)
+    
+    for i in text_to_add:
+        Log_textarea.insert(END,i+"\n")
+        Log_textarea.insert(END," \n")
+        
+    Log_textarea.insert(END,"-"*50 )
+    Log_textarea.config(state = DISABLED)
+#create the log space
+Log_textarea_frame = Frame(root)
+Log_textarea_frame.pack()
+Log_textarea = scrolledtext.ScrolledText(Log_textarea_frame, width = 50,state = DISABLED)
+log(["WELCOME TO OSU! BACKGROUND REMOVER!"])
+
+
+Log_textarea.grid(row=0,column=0)
 
 
 root.mainloop()
