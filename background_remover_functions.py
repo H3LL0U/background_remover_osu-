@@ -2,7 +2,7 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
-
+from tkinter import *
 
 #might imploment a propper GUI later
 
@@ -37,9 +37,10 @@ def get_background_images_paths(the_osu_directory_path =None,ask_user = True ):
     osu_directory = the_osu_directory_path 
 
     #checks if the directory has osu! in the path just in case
-    if not(osu_directory) or(not("osu!" in osu_directory) and osu_directory[-6]!="/Songs"):
+    if not(osu_directory) or ((osu_directory[-10:]!="osu!\Songs")and (osu_directory[-10:]!="osu!/Songs")):
+        
         raise(
-            Exception("The drectory you specified does not have word osu! in it. Please select one that does.\n (It is done for the safety of your files)")
+            Exception("The drectory you specified does not contain 'osu!/Songs in it. Please select one that does.\n (It is done for the safety of your files)")
         )
 
     files_inside_the_folder = ""
@@ -86,18 +87,31 @@ def get_background_images_paths(the_osu_directory_path =None,ask_user = True ):
             #checks if the path exists and i is not "" just in case
             if os.path.exists(i) and i:
                 
-                
-                
                 if user_answer:
-                    
-                
-                
-                    
                     yield i
                     #os.remove(i)
 def remove_backgrounds_fully(iterable_with_paths):
     if iterable_with_paths.__name__ == "get_background_images_paths":
         for i in iterable_with_paths:
-            #print("removed")
+            
             os.remove(i)
 
+def open_info_window():
+    root = Tk()
+    root.geometry("800x200")
+    root.configure(bg='white')
+    root.resizable(False,False)
+    info_lable = Label(root,text=
+                       
+                       
+                       '''
+How does it work?
+You can download the repo and open the executable in the build folder.
+From there you can select the osu!/Songs folder where all of your songs files are located.
+(You can do it manually by pressing the Manual search button or let the app find the possible location for you by pressing the auto search button)
+if you selected the right folder all the background images paths will be displayed bellow in the Log text area
+You can then proceed by pressing the Confirm button and confirming your actions.
+Congratulations! All of the backgrounds have been deleted!
+
+                       ''' , bg='white')
+    info_lable.pack()

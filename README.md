@@ -4,7 +4,7 @@ This program can help you fix this issue by (at the moment) deleting all the bac
 
 
 How does it work?
-You can download the repo and open the executable in the build file.
+You can download the repo and open the executable in the build folder.
 From there you can select the osu!/Songs folder where all of your songs files are located.
 (You can do it manually by pressing the Manual search button or let the app find the possible location for you by pressing the auto search button)
 if you selected the right folder all the background images paths will be displayed bellow in the Log text area

@@ -1,4 +1,4 @@
-from background_remover_functions import remove_backgrounds_fully, os , find_directories, filedialog , messagebox , get_background_images_paths
+from background_remover_functions import remove_backgrounds_fully, os , find_directories, filedialog , messagebox , get_background_images_paths,open_info_window
 from tkinter import *
 import tkinter.scrolledtext as scrolledtext
 #try to find an osu! directory location
@@ -14,10 +14,13 @@ def find_next_possible_location():
         #initialize first ellements in the listbox
 
         possible_osu_directory_path_listbox.insert(END,possible_directory[-1])
+        log([f"NEW POSSIBLE DIRECTORY HAS BEEN FOUND:\n{possible_directory[-1]}"])
         possible_osu_directory_path_listbox.config(width= max((len(i) for i in possible_directory),default=1))
     except:
         search_button.grid_forget()
         log(["ALL THE DIRECTORIES ON YOUR COMPUTER HAVE BEEN CHECKED"])
+    
+    
 
 
     
@@ -33,7 +36,19 @@ root.title("Osu! background remover")
 main_frame = Frame(root)
 main_frame.pack()
 
+#info menu
+menu = Menu(root,tearoff=0)
+menu_cascade = Menu(menu,tearoff=0)
 
+save_background_mode = BooleanVar()
+save_background_mode.set(False)
+menu_cascade.add_checkbutton(label='Save the backgrounds', variable=save_background_mode)
+
+menu_cascade.add_command(label="info",command=open_info_window)
+menu.add_cascade(menu=menu_cascade ,label='Settings')
+
+
+root.configure(menu=menu)
 #Description label
 
 Label(main_frame,text="Sellect the osu/songs path:").pack()
@@ -81,8 +96,8 @@ possible_osu_directory_path_listbox.bind("<<ListboxSelect>>",auto_change_osu_pat
 possible_osu_directory_path_listbox.grid(column=1,row=1)
 
 #Create auto - search button
-search_button = Button(possible_osu_directory_path_listbox_frame, text='🔍', command=find_next_possible_location)
-search_button.grid(column=2,row=1)
+search_button = Button(possible_osu_directory_path_listbox_frame, text='🔍', command=find_next_possible_location,)
+search_button.grid(column=2,row=1,padx=20)
 
 #manual - search button
 def manual_search_func():
@@ -91,6 +106,8 @@ def manual_search_func():
         possible_directory_to_add = filedialog.askdirectory(parent=root ,title="Select osu!/Songs folder")
         if possible_directory_to_add in possible_directory:
             raise(Exception("SELECTED DIRECTORY ALREADY EXISTS IN THE LISTBOX"))
+        if not(possible_directory_to_add):
+            raise(Exception("YOU DID NOT SELECT A DIRECTORY"))
         possible_directory.append(possible_directory_to_add)
         possible_osu_directory_path_listbox.insert(END,possible_directory[-1])
         log(["SELECTED DIRECTORY HAS BEEN ADDED:", possible_directory_to_add])
@@ -98,7 +115,7 @@ def manual_search_func():
     except Exception as error:
         log([str(error)])
 manual_search_button = Button(possible_osu_directory_path_listbox_frame,text="Manual Search",command=manual_search_func)
-manual_search_button.grid(column=0,row=1)
+manual_search_button.grid(column=0,row=1,padx=20)
 
 
 #Create the confirm button
@@ -138,6 +155,19 @@ log(["WELCOME TO OSU! BACKGROUND REMOVER!"])
 
 
 Log_textarea.grid(row=0,column=0)
+
+def clear_Log():
+    Log_textarea.config(state=NORMAL)
+    Log_textarea.delete(0.0,END)
+    Log_textarea.config(state=DISABLED)
+    
+    
+#create clear button
+clear_button_frame = Frame(root)
+clear_button_frame.pack()
+clear_button = Button(clear_button_frame,text='Clear Log',command=clear_Log)
+clear_button.pack()
+
 
 
 root.mainloop()
