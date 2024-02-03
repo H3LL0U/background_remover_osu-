@@ -1,9 +1,10 @@
-from background_remover_functions import remove_backgrounds_fully, os , find_directories, filedialog , messagebox , get_background_images_paths,open_info_window
+from background_remover_functions import remove_backgrounds_fully, os , find_directories, filedialog , messagebox , get_background_images_paths,open_info_window, shutil, copy_directories , create_ask_window
 from tkinter import *
 import tkinter.scrolledtext as scrolledtext
-#try to find an osu! directory location
+
+#search through the directories to find the location that has osu!/Songs at the end
 possible_directory = []
-possible_directory_generator = find_directories("C:/", "osu!\Songs")
+possible_directory_generator = find_directories("C:\\", "osu!\\Songs")
 def find_next_possible_location():
     
     global possible_directory
@@ -11,7 +12,7 @@ def find_next_possible_location():
     
         
         possible_directory.append(possible_directory_generator.__next__())
-        #initialize first ellements in the listbox
+        
 
         possible_osu_directory_path_listbox.insert(END,possible_directory[-1])
         log([f"NEW POSSIBLE DIRECTORY HAS BEEN FOUND:\n{possible_directory[-1]}"])
@@ -36,15 +37,24 @@ root.title("Osu! background remover")
 main_frame = Frame(root)
 main_frame.pack()
 
-#info menu
+#Settings menu------------------------------
 menu = Menu(root,tearoff=0)
 menu_cascade = Menu(menu,tearoff=0)
 
 save_background_mode = BooleanVar()
-save_background_mode.set(False)
+save_background_mode.set(True)
 menu_cascade.add_checkbutton(label='Save the backgrounds', variable=save_background_mode)
 
-menu_cascade.add_command(label="info",command=open_info_window)
+menu_cascade.add_command(label="info",command=lambda: log([
+    '''How does it work?
+You can download the repo and open the executable in the build folder.
+From there you can select the osu!/Songs folder where all of your songs files are located.
+(You can do it manually by pressing the Manual search button or let the app find the possible location for you by pressing the auto search button)
+if you selected the right folder all the background images paths will be displayed bellow in the Log text area
+You can then proceed by pressing the Confirm button and confirming your actions.
+Congratulations! All of the backgrounds have been deleted!
+''']
+))
 menu.add_cascade(menu=menu_cascade ,label='Settings')
 
 
@@ -70,7 +80,7 @@ osu_main_directory_var.trace_add(mode="write",callback=adjust_width(osu_main_dir
 
 
 
-#create the Listbox with posible directories that the program has found
+#create the Listbox with posible directories that were found by the auto or manual search
 possible_osu_directory_path_listbox_frame = Frame(main_frame)
 possible_osu_directory_path_listbox_frame.pack()
 possible_osu_directory_path_listbox = Listbox(possible_osu_directory_path_listbox_frame, height=len(possible_directory), width = max((len(i) for i in possible_directory),default=1),)
@@ -99,7 +109,7 @@ possible_osu_directory_path_listbox.grid(column=1,row=1)
 search_button = Button(possible_osu_directory_path_listbox_frame, text='🔍', command=find_next_possible_location,)
 search_button.grid(column=2,row=1,padx=20)
 
-#manual - search button
+#manual - search button-------------------------------
 def manual_search_func():
     global possible_directory
     try:
@@ -118,17 +128,23 @@ manual_search_button = Button(possible_osu_directory_path_listbox_frame,text="Ma
 manual_search_button.grid(column=0,row=1,padx=20)
 
 
-#Create the confirm button
+#Create the confirm button-----------------------------------------
 
-#removesimages from osu!/Songs path is set correctly
+#removesimages from osu!/Songs path is set correctly var = osu!/Songs directory
 def remove_bg_confirm(var):
     def wrapper():
-        #log(["PATHS TO BACKGROUNDS TO REMOVE ARE:"])
-        #log(get_background_images_paths(var.get(),ask_user=False))
+
         try:
+            if save_background_mode.get() and create_ask_window('Are you sure you want to move the files (They will be saved in a backed up backgrounds folder)'):
+                copy_directories(get_background_images_paths(var.get(),False))
+                log(['ALL THE BACKGROUND IMAGES HAVE BEEN MOVED TO backed up backgrounds folder'])
             
-            remove_backgrounds_fully(get_background_images_paths(var.get()))
-            log(["ALL THE BACKGROUND IMAGES HAVE BEEN REMOVED!"])
+            elif save_background_mode.get():
+                raise(Exception('The moving of the background images has been canceled'))
+
+            else:
+                remove_backgrounds_fully(get_background_images_paths(var.get()))
+                log(["ALL THE BACKGROUND IMAGES HAVE BEEN DELETED!"])
         except Exception as error:
             messagebox.showerror("error",error)
             log([str(error)])
@@ -136,8 +152,8 @@ def remove_bg_confirm(var):
 
 confirm_the_removal = Button(root,text="Confirm", command=remove_bg_confirm(osu_main_directory_var))
 confirm_the_removal.pack()
-
-#takes in a tuple and inserts it into the Log space 
+#create the log space----------------------------------------
+#takes in a tuple of strings and inserts it into the Log space 
 def log(text_to_add = []):
     Log_textarea.config(state=NORMAL)
     
@@ -147,7 +163,7 @@ def log(text_to_add = []):
         
     Log_textarea.insert(END,"-"*50 )
     Log_textarea.config(state = DISABLED)
-#create the log space
+
 Log_textarea_frame = Frame(root)
 Log_textarea_frame.pack()
 Log_textarea = scrolledtext.ScrolledText(Log_textarea_frame, width = 50,state = DISABLED)
@@ -155,14 +171,14 @@ log(["WELCOME TO OSU! BACKGROUND REMOVER!"])
 
 
 Log_textarea.grid(row=0,column=0)
-
+#create clear button----------------------------
 def clear_Log():
     Log_textarea.config(state=NORMAL)
     Log_textarea.delete(0.0,END)
     Log_textarea.config(state=DISABLED)
     
     
-#create clear button
+
 clear_button_frame = Frame(root)
 clear_button_frame.pack()
 clear_button = Button(clear_button_frame,text='Clear Log',command=clear_Log)
