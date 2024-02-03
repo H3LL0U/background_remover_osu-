@@ -28,7 +28,7 @@ def find_directories(root_dir, pattern):
 
 
     #takes in the osu!/Songs path returns the paths of the background-images 
-def get_background_images_paths(the_osu_directory_path =None,ask_user = True, save_background_mode = True ):
+def get_background_images_paths(the_osu_directory_path =None,ask_user = True):
     if the_osu_directory_path is None:
        the_osu_directory_path =filedialog.askdirectory(title="select the 'osu!/Songs' folder (from there all the images that are more than 100000 bytes will be removed)")
     
@@ -147,15 +147,21 @@ def copy_directories(iterable_with_paths,program_root_path = os.getcwd()):
             if '.' in image_path:
 
                 shutil.move(image_path,backed_up_map_dir)
-    '''
-    list_with_directories = os.listdir(osu_songs_path)
-    if not(os.path.exists(program_root_path+"\\backed up backgrounds")):
-        os.makedirs('backed up backgrounds')
 
-    if os.path.exists(program_root_path+"\\backed up backgrounds"):
+#Gets images from the backed up backgrounds folder and puts them back into the folder of the song it was taken from
+def restore_bgs(osu_songs_dir, backed_up_bgs_dir):
+    if not(os.path.exists(backed_up_bgs_dir)):
+        raise(Exception('No backgrounds saved yet!'))
 
-        for dir in list_with_directories:
-            if not(os.path.exists(program_root_path+"\\backed up backgrounds\\"+dir)):
-                os.makedirs(program_root_path+"\\backed up backgrounds\\"+dir)
-        '''
+    saved_maps_names= os.walk(backed_up_bgs_dir).__next__()[1]
+    
+    for saved_map in saved_maps_names:
+        backed_up_dir_contents_paths = [backed_up_bgs_dir+'\\'+saved_map+'\\'+i for i in os.walk(backed_up_bgs_dir+'\\'+saved_map).__next__()[2]]
+        
+        for image_path in backed_up_dir_contents_paths:
+            if os.path.exists(osu_songs_dir+'\\'+saved_map):
+
+                shutil.move(image_path,osu_songs_dir+'\\'+saved_map)
+            
+        
 

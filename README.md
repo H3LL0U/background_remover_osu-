@@ -9,7 +9,11 @@ From there you can select the osu!/Songs folder where all of your songs files ar
 (You can do it manually by pressing the Manual search button or let the app find the possible location for you by pressing the auto search button)
 if you selected the right folder all the background images paths will be displayed bellow in the Log text area
 You can then proceed by pressing the Confirm button and confirming your actions.
-Congratulations! All of the backgrounds have been deleted!
+Congratulations! All of the backgrounds have been moved to the backed up backgrounds folder!
+
+If you want to restore your backgrounds that you previously saved you can select your osu!/Songs folder once again and press 'restore backgrounds' in the upper menu. After confirming the backgrounds will be back for each song that you have previously saved!
+
+If you want to delete your backgrounds permenantly you can uncheck the 'Save backgrounds' from the settings. and proceed the same way as if you were saving the backgrounds.
 (See #TODO and #Known issues for more information or contact me using the contacts bellow :D)
 
 
@@ -23,7 +27,7 @@ complete the GUI and add other functionality
 #Known issues:
 When auto searching for the osu folder the app freezes because it doesn't search for the osu!/Songs folder asynchronously
 
-
+When saving or deleting the backgrounds the application may freeze for a bit. Please do not close the application during that time
 
 
 If you want to help with the project feel free to reach out:

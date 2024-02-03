@@ -1,4 +1,4 @@
-from background_remover_functions import remove_backgrounds_fully, os , find_directories, filedialog , messagebox , get_background_images_paths,open_info_window, shutil, copy_directories , create_ask_window
+from background_remover_functions import remove_backgrounds_fully, os , find_directories, filedialog , messagebox , get_background_images_paths,open_info_window, shutil, copy_directories , create_ask_window, restore_bgs
 from tkinter import *
 import tkinter.scrolledtext as scrolledtext
 
@@ -57,6 +57,20 @@ Congratulations! All of the backgrounds have been deleted!
 ))
 menu.add_cascade(menu=menu_cascade ,label='Settings')
 
+def restoration():
+    try:
+        ask_user = create_ask_window('Are you sure you want to restore the backgrounds you saved? to the selected osu!/Songs folder?')
+        if ask_user:
+            #checks if this directory can be considered as an osu dir
+            list(get_background_images_paths(osu_main_directory_var.get(),False))
+            restore_bgs(osu_main_directory_var.get(),os.getcwd()+'\\backed up backgrounds')
+            log(['all the backgrounds have been restored!'])
+
+            
+    except Exception as error:
+        log([str(error)])
+        
+menu.add_command(label='Restore backgrounds', command=restoration)
 
 root.configure(menu=menu)
 #Description label
@@ -185,7 +199,7 @@ clear_button = Button(clear_button_frame,text='Clear Log',command=clear_Log)
 clear_button.pack()
 
 #Create warning if the remove backgrounds fully is active:
-warning_label = Label(root,text='WARNING: \nYOU HAVE SAVE BACKGROUNDS\n DISABLED! IF YOU PROCEED\n YOU WILL NOT BE ABLE TO\n RESTORE YOUR\n BACKGROUNDS!', bg='yellow', font = ('Arial', 7))
+warning_label = Label(root,text='WARNING: \n your backgrounds\n will not be saved', bg='yellow', font = ('Arial', 7))
 if not(save_background_mode.get()):
     warning_label.place(x = 0,y=0)
 def add_warning(*k):
