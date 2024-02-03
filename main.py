@@ -184,6 +184,19 @@ clear_button_frame.pack()
 clear_button = Button(clear_button_frame,text='Clear Log',command=clear_Log)
 clear_button.pack()
 
-
+#Create warning if the remove backgrounds fully is active:
+warning_label = Label(root,text='WARNING: \nYOU HAVE SAVE BACKGROUNDS\n DISABLED! IF YOU PROCEED\n YOU WILL NOT BE ABLE TO\n RESTORE YOUR\n BACKGROUNDS!', bg='yellow', font = ('Arial', 7))
+if not(save_background_mode.get()):
+    warning_label.place(x = 0,y=0)
+def add_warning(*k):
+    current_mode = save_background_mode.get()
+    
+        
+    if current_mode:
+        warning_label.place_forget()
+    else:
+        warning_label.place(x = 0, y =0)
+    
+save_background_mode.trace_add('write',callback=add_warning)
 
 root.mainloop()
