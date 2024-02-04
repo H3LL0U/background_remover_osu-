@@ -16,9 +16,12 @@ def create_ask_window(text_to_display = ""):
         return False
     
 #find the directories that match the pattern
-def find_directories(root_dir, pattern):
+def find_directories(root_dir, pattern, root):
+    
     
     for dirpath, dirnames, filenames in os.walk(root_dir):
+        root.update()
+        
         if pattern in dirpath and dirpath[-len(pattern):]==pattern:
             yield dirpath
 

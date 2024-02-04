@@ -2,37 +2,45 @@ from background_remover_functions import remove_backgrounds_fully, os , find_dir
 from tkinter import *
 import tkinter.scrolledtext as scrolledtext
 
+
+    
+
+root = Tk()
+root.resizable(False, False)
+root.geometry("500x500")
+root.title("Osu! background remover")
+
+
+
 #search through the directories to find the location that has osu!/Songs at the end
 possible_directory = []
-possible_directory_generator = find_directories("C:\\", "osu!\\Songs")
+possible_directory_generator = find_directories("C:\\", "osu!\\Songs", root=root)
+searching = False
 def find_next_possible_location():
     
-    global possible_directory
+    global possible_directory , searching
+
     try:
-    
-        
+        #checks if the search has started or not
+        if searching:
+            log(['The auto search was already started!'])
+            return
+        searching = True
+        label = Label(possible_osu_directory_path_listbox_frame,text='Searching...')
+        label.grid(column=3,row=1)
         possible_directory.append(possible_directory_generator.__next__())
+        label.grid_forget()
+        searching = False
         
 
         possible_osu_directory_path_listbox.insert(END,possible_directory[-1])
         log([f"NEW POSSIBLE DIRECTORY HAS BEEN FOUND:\n{possible_directory[-1]}"])
         possible_osu_directory_path_listbox.config(width= max((len(i) for i in possible_directory),default=1))
     except:
+        label.grid_forget()
         search_button.grid_forget()
         log(["ALL THE DIRECTORIES ON YOUR COMPUTER HAVE BEEN CHECKED"])
-    
-    
 
-
-    
-        
-
-
-
-root = Tk()
-root.resizable(False, False)
-root.geometry("500x500")
-root.title("Osu! background remover")
 
 main_frame = Frame(root)
 main_frame.pack()
