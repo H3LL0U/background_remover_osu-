@@ -18,15 +18,10 @@ If you want to delete your backgrounds permenantly you can uncheck the 'Save bac
 
 
 #TODO:
-add a system that stores maps instead of deleting them so that you can switch between having backgrounds and not having them
-
-make the auto-search run asynchronosly, so that nothing freezes while it's searching for the osu!/Songs folder
-
-complete the GUI and add other functionality
+add a system which displays the maps in which you have the backgrounds saved
+add a system that can replace all the backgrounds with a chosen image
 
 #Known issues:
-When auto searching for the osu folder the app freezes because it doesn't search for the osu!/Songs folder asynchronously
-
 When saving or deleting the backgrounds the application may freeze for a bit. Please do not close the application during that time
 
 

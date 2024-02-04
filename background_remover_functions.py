@@ -6,8 +6,8 @@ from tkinter import *
 import shutil
 
 #ask user
-def create_ask_window(text_to_display = ""):
-    response = messagebox.askyesnocancel("remove_the_files" ,f"{text_to_display}")
+def create_ask_window(text_to_display = "", title = "remove the backgrounds"):
+    response = messagebox.askyesnocancel(title ,f"{text_to_display}")
     if response is None:
         return None
     elif response:
@@ -106,7 +106,7 @@ def remove_backgrounds_fully(iterable_with_paths, full_removal = False):
         for i in iterable_with_paths:
             
             os.remove(i)
-
+#this window is not being used
 def open_info_window():
     root = Tk()
     root.geometry("800x200")
@@ -117,12 +117,18 @@ def open_info_window():
                        
                        '''
 How does it work?
-You can download the repo and open the executable in the build folder.
-From there you can select the osu!\\Songs folder where all of your songs files are located.
-(You can do it manually by pressing the Manual search button or let the app find the possible location for you by pressing the auto search button)
+
+You can select the osu!/Songs folder where all of your songs' files are located.
+(You can do it manually by pressing the Manual search button or 
+let the app find the possible location for you by pressing the auto search button)
 if you selected the right folder all the background images paths will be displayed bellow in the Log text area
 You can then proceed by pressing the Confirm button and confirming your actions.
-Congratulations! All of the backgrounds have been deleted!
+Congratulations! All of the backgrounds have been moved to the backed up backgrounds folder!
+
+
+If you want to restore your backgrounds that you previously saved you can select your osu!/Songs folder once again and press 'restore backgrounds' in the upper menu. After confirming the backgrounds will be back for each song that you have previously saved!
+
+If you want to delete your backgrounds permenantly you can uncheck the 'Save backgrounds' from the settings. and proceed the same way as if you were saving the backgrounds.
 
                        ''' , bg='white')
     info_lable.pack()

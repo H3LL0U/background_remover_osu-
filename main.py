@@ -7,7 +7,7 @@ import tkinter.scrolledtext as scrolledtext
 
 root = Tk()
 root.resizable(False, False)
-root.geometry("500x500")
+root.geometry("500x575")
 root.title("Osu! background remover")
 
 
@@ -18,7 +18,7 @@ possible_directory_generator = find_directories("C:\\", "osu!\\Songs", root=root
 searching = False
 def find_next_possible_location():
     
-    global possible_directory , searching
+    global possible_directory , searching, searching_indicator
 
     try:
         #checks if the search has started or not
@@ -26,10 +26,11 @@ def find_next_possible_location():
             log(['The auto search was already started!'])
             return
         searching = True
-        label = Label(possible_osu_directory_path_listbox_frame,text='Searching...')
-        label.grid(column=3,row=1)
+        
+        searching_indicator.config(text='Searching...')
+        
         possible_directory.append(possible_directory_generator.__next__())
-        label.grid_forget()
+        searching_indicator.config(text='                  ')
         searching = False
         
 
@@ -37,7 +38,7 @@ def find_next_possible_location():
         log([f"NEW POSSIBLE DIRECTORY HAS BEEN FOUND:\n{possible_directory[-1]}"])
         possible_osu_directory_path_listbox.config(width= max((len(i) for i in possible_directory),default=1))
     except:
-        label.grid_forget()
+        searching_indicator.grid_forget()
         search_button.grid_forget()
         log(["ALL THE DIRECTORIES ON YOUR COMPUTER HAVE BEEN CHECKED"])
 
@@ -54,13 +55,25 @@ save_background_mode.set(True)
 menu_cascade.add_checkbutton(label='Save the backgrounds', variable=save_background_mode)
 
 menu_cascade.add_command(label="info",command=lambda: log([
-    '''How does it work?
-You can download the repo and open the executable in the build folder.
-From there you can select the osu!/Songs folder where all of your songs files are located.
+    '''
+How does it work?
+
+You can select the osu!/Songs folder where all of your songs files are located.
 (You can do it manually by pressing the Manual search button or let the app find the possible location for you by pressing the auto search button)
 if you selected the right folder all the background images paths will be displayed bellow in the Log text area
 You can then proceed by pressing the Confirm button and confirming your actions.
-Congratulations! All of the backgrounds have been deleted!
+Congratulations! All of the backgrounds have been moved to the backed up backgrounds folder!
+
+Restoring previously saved backgrounds:
+
+If you want to restore your backgrounds that you previously saved you can select your osu!/Songs
+folder once again and press 'restore backgrounds' in the upper menu. 
+After confirming the backgrounds will be back for each song that you have previously saved!
+
+Deleting backgrounds permenantly:
+
+If you want to delete your backgrounds permenantly you can uncheck the 'Save backgrounds' 
+from the settings. and proceed the same way as if you were saving the backgrounds.
 ''']
 ))
 menu.add_cascade(menu=menu_cascade ,label='Settings')
@@ -87,7 +100,7 @@ Label(main_frame,text="Sellect the osu/songs path:").pack()
 
 #create entry for user to type his osu directory
 osu_main_directory_var = StringVar()
-path_text_box = Entry(main_frame,textvariable=osu_main_directory_var)
+path_text_box = Entry(main_frame,textvariable=osu_main_directory_var,)
 path_text_box.pack()
 
 
@@ -95,7 +108,7 @@ path_text_box.pack()
 def adjust_width(var,widget):
     def wrapper(*k):
         if len(var.get())>20:
-            widget.config(width = len(var.get()))
+            widget.config(width = min(len(var.get()),40))
     return wrapper
 
 osu_main_directory_var.trace_add(mode="write",callback=adjust_width(osu_main_directory_var,path_text_box))
@@ -105,7 +118,7 @@ osu_main_directory_var.trace_add(mode="write",callback=adjust_width(osu_main_dir
 #create the Listbox with posible directories that were found by the auto or manual search
 possible_osu_directory_path_listbox_frame = Frame(main_frame)
 possible_osu_directory_path_listbox_frame.pack()
-possible_osu_directory_path_listbox = Listbox(possible_osu_directory_path_listbox_frame, height=len(possible_directory), width = max((len(i) for i in possible_directory),default=1),)
+possible_osu_directory_path_listbox = Listbox(possible_osu_directory_path_listbox_frame, height=5, width = 40)#max((len(i) for i in possible_directory),default=10))
 
 
 
@@ -126,7 +139,9 @@ def auto_change_osu_path_entry(*ok):
 possible_osu_directory_path_listbox.bind("<<ListboxSelect>>",auto_change_osu_path_entry)
 
 possible_osu_directory_path_listbox.grid(column=1,row=1)
-
+#filler
+searching_indicator = Label(possible_osu_directory_path_listbox_frame, text='                  ')
+searching_indicator.grid(column=4,row=1)
 #Create auto - search button
 search_button = Button(possible_osu_directory_path_listbox_frame, text='🔍', command=find_next_possible_location,)
 search_button.grid(column=2,row=1,padx=20)
@@ -157,7 +172,7 @@ def remove_bg_confirm(var):
     def wrapper():
 
         try:
-            if save_background_mode.get() and create_ask_window('Are you sure you want to move the files (They will be saved in a backed up backgrounds folder)'):
+            if save_background_mode.get() and create_ask_window('Are you sure you want to move the files (They will be saved in a backed up backgrounds folder)', "remove the backgrounds?"):
                 copy_directories(get_background_images_paths(var.get(),False))
                 log(['ALL THE BACKGROUND IMAGES HAVE BEEN MOVED TO backed up backgrounds folder'])
             
@@ -182,8 +197,9 @@ def log(text_to_add = []):
     for i in text_to_add:
         Log_textarea.insert(END,i+"\n")
         Log_textarea.insert(END," \n")
-        
+    
     Log_textarea.insert(END,"-"*50 )
+    Log_textarea.yview_moveto(1)
     Log_textarea.config(state = DISABLED)
 
 Log_textarea_frame = Frame(root)
