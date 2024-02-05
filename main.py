@@ -87,7 +87,19 @@ def restoration():
         log([str(error)])
         
 menu.add_command(label='Restore backgrounds', command=restoration)
+#Dark/Lightmode switcher-----------------------------
+Darkmode_checkbutton_var = BooleanVar()
+Darkmode_checkbutton_var.set(True)
 
+def change_visual_mode():
+    if not(Darkmode_checkbutton_var.get()):
+        set_appearance_mode('dark')
+        menu.entryconfigure('Dark mode', label='Light mode')
+    else:
+        menu.entryconfigure('Light mode', label='Dark mode')
+        set_appearance_mode('light')
+
+menu.add_checkbutton(label='Dark mode',command=change_visual_mode,variable=Darkmode_checkbutton_var)
 root.configure(menu=menu)
 #Description label
 
