@@ -17,6 +17,10 @@ If you want to delete your backgrounds permenantly you can uncheck the 'Save bac
 (See #TODO and #Known issues for more information or contact me using the contacts bellow :D)
 
 
+
+#Used libraries:
+tk                        0.1.0
+
 #TODO:
 add a system which displays the maps in which you have the backgrounds saved
 add a system that can replace all the backgrounds with a chosen image
