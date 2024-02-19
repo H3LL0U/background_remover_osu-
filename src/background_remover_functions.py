@@ -4,9 +4,17 @@ from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import *
 import shutil
-
+import imghdr
+from typing import Generator
 #ask user
-def create_ask_window(text_to_display = "", title = "remove the backgrounds"):
+def create_ask_window(text_to_display = "", title = "remove the backgrounds") -> bool | None:
+    '''
+    Creates ask window
+    returns:
+            user pressed yes -> True
+            user pressed No -> False
+            user pressed cancel or closed the window -> None
+    '''
     response = messagebox.askyesnocancel(title ,f"{text_to_display}")
     if response is None:
         return None
@@ -15,9 +23,11 @@ def create_ask_window(text_to_display = "", title = "remove the backgrounds"):
     else:
         return False
     
-#find the directories that match the pattern
-def find_directories(root_dir, pattern, root):
-    
+
+def find_directories(root_dir, pattern, root)-> Generator[str, None, None] :
+    '''
+    finds the directories that match the pattern and yields them
+    '''
     
     for dirpath, dirnames, filenames in os.walk(root_dir):
         root.update()
@@ -30,12 +40,16 @@ def find_directories(root_dir, pattern, root):
         
 
 
-    #takes in the osu!/Songs path returns the paths of the background-images 
-def get_background_images_paths(the_osu_directory_path =None,ask_user = True):
+    
+def get_background_images_paths(the_osu_directory_path =None,ask_user = True)-> Generator[str, None, None]:
+    '''
+    takes in the osu!/Songs path returns the paths of the background-images 
+    '''
+    
     if the_osu_directory_path is None:
        the_osu_directory_path =filedialog.askdirectory(title="select the 'osu!/Songs' folder (from there all the images that are more than 100000 bytes will be removed)")
     
-#store the osu song directory
+    #store the osu song directory
     
     osu_directory = the_osu_directory_path 
 
@@ -100,17 +114,27 @@ def get_background_images_paths(the_osu_directory_path =None,ask_user = True):
                 if user_answer:
                     yield i
                     #os.remove(i)
-def remove_backgrounds_fully(iterable_with_paths, full_removal = False):
+def remove_backgrounds_fully(iterable_with_paths) -> None:
+    '''
+    takes in: get_background_images_paths generator
 
+    output: Removal of all backgrounds without saving
+
+    remove all the backgrounds with the help of get_background_images_paths generator
+    '''
     if iterable_with_paths.__name__ == "get_background_images_paths":
         for i in iterable_with_paths:
             
             os.remove(i)
 
 
-#Copies the names of the directories with map names from osu directory-----
+
     
-def copy_directories(iterable_with_paths,program_root_path = os.getcwd()):
+def copy_directories(iterable_with_paths,program_root_path = os.getcwd())-> None:
+
+    '''
+    #Copies the names of the directories with map names from osu directory-----
+    '''
     if iterable_with_paths.__name__ !="get_background_images_paths":
         raise(Exception("The iterable provided wasn't created by get_osu_backgrounds function"))
     backed_up_bg_dir = program_root_path+"\\backed up backgrounds"
@@ -128,12 +152,15 @@ def copy_directories(iterable_with_paths,program_root_path = os.getcwd()):
             if not(os.path.exists(backed_up_map_dir)):
                 
                 os.makedirs(backed_up_map_dir)
-            if '.' in image_path:
+            if os.path.isfile(image_path):
 
                 shutil.move(image_path,backed_up_map_dir)
 
-#Gets images from the backed up backgrounds folder and puts them back into the folder of the song it was taken from
-def restore_bgs(osu_songs_dir, backed_up_bgs_dir):
+
+def restore_bgs(osu_songs_dir, backed_up_bgs_dir) -> None:
+    '''
+    #Gets images from the backed up backgrounds folder and puts them back into the folder of the song it was taken from
+    '''
     if not(os.path.exists(backed_up_bgs_dir)):
         raise(Exception('No backgrounds saved yet!'))
 
@@ -147,5 +174,28 @@ def restore_bgs(osu_songs_dir, backed_up_bgs_dir):
 
                 shutil.move(image_path,osu_songs_dir+'\\'+saved_map)
             
+def copy_image_to_default_images(image_path: str) -> None:
+    '''
+    copies an image from a selected path to default images that later can be selected as a replacement for all of the backgrounds
+    '''
+    if not(os.path.exists( os.getcwd()+r"\default backgrounds")):
+        os.mkdir(os.getcwd()+r"\default backgrounds")
+    if imghdr.what(image_path):
+
+        shutil.copy2(image_path,os.getcwd()+r"\default backgrounds")
+
+def find_all_default_images_paths():
+    '''
+    Yields all of the images' paths from default backgrounds
+    '''
+    path_to_default_bgs = os.getcwd()+r"\default backgrounds"
+    if not(os.path.exists(path_to_default_bgs )):
+        os.mkdir(path_to_default_bgs)
+    for image in os.listdir(path_to_default_bgs):
+        if imghdr.what(path_to_default_bgs+"\\"+image):
+
+            yield path_to_default_bgs+"\\"+image
+
+
         
 

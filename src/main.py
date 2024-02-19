@@ -2,12 +2,12 @@ from background_remover_functions import remove_backgrounds_fully, os , find_dir
 from customtkinter import *
 import tkinter.scrolledtext as scrolledtext
 from tkinter import *
-
+from change_all_osu_backgrounds_to_img import change_backgrounds_selector
     
 #==========================ROOT==================================================
 root = CTk()
 root.resizable(False, False)
-root.geometry("500x575")
+#root.geometry("500x575")
 root.title("Osu! background remover")
 
 
@@ -71,6 +71,9 @@ Deleting backgrounds permenantly:
 If you want to delete your backgrounds permenantly you can uncheck the 'Save backgrounds' from the settings. and proceed the same way as if you were saving the backgrounds.
 ''']
 ))
+def open_change_background_selector() -> None:
+    change_backgrounds_selector()
+menu.add_command(label="Change to selected background", command=open_change_background_selector)
 menu.add_cascade(menu=menu_cascade ,label='Settings')
 #=========================RESTORE BACKGROUNDS BUTTON==========================
 

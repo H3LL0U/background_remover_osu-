@@ -19,8 +19,11 @@ If you want to delete your backgrounds permenantly you can uncheck the 'Save bac
 
 
 #Used libraries:
-tk                        0.1.0
+customtkinter 5.2.2
+Tcl/tk 8.6.13
 
+#for build
+cx_Freeze     6.16.0.dev38
 #TODO:
 add a system which displays the maps in which you have the backgrounds saved
 add a system that can replace all the backgrounds with a chosen image
