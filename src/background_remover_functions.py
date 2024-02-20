@@ -230,7 +230,43 @@ def find_all_osu_maps_folders(osu_directory: str)-> list[str]:
         raise (
             Exception("this directory does not exist")
             )
-    return every_map
+    return [f"{osu_directory}\\{i}".replace("\\",'/') for i in every_map]
+def rename_image_to(image_path: str, new_name: str) -> None:
+    '''
+    takes in an image path and changes the image's name to a new one without changing the extension
+    example:
+        image_path = image/path/image.jpg
+        new_name = new_image
+        outcome -> image/path/new_image.jpg (the new path to the image)
+    '''
+    if not(os.path.exists(image_path)):
+        raise(Exception("The path to rename does not exist"))
+    if not(imghdr.what(image_path)):
+        raise(Exception("The path you specified is not an image"))
+    dir, extension = os.path.splitext(image_path)
+    dir , file_name = os.path.split(dir)
+    file_name = new_name
+    new_path = f"{dir}\\{file_name}{extension}"
+    os.rename(image_path,new_path)
+
+def copy_image_to_paths(image_path: str, new_dirs_with_image : list[str])-> None:
+    '''
+    takes in image path to copy
+    and new directories where the image will be copied to
+
+    outcome -> image is copied to these paths
+    '''
+    if os.path.exists(image_path):
+        for i in new_dirs_with_image:
+            if os.path.exists(i):
+
+
+                shutil.copy2(image_path,i)
+            else:
+                raise(Exception("The path to New directory does not exist"))
+    else:
+        raise(Exception("The path of an image you selected does not exist"))
+    
 
 
 

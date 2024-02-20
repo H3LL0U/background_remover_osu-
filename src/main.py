@@ -1,9 +1,9 @@
-from background_remover_functions import remove_backgrounds_fully, os , find_directories, filedialog , messagebox , get_background_images_paths, shutil, copy_directories , create_ask_window, restore_bgs,find_all_osu_maps_folders
+from background_remover_functions import remove_backgrounds_fully, os , find_directories, filedialog , messagebox , get_background_images_paths, shutil, copy_directories , create_ask_window, restore_bgs,find_all_osu_maps_folders, rename_image_to, copy_image_to_paths
 from customtkinter import *
 import tkinter.scrolledtext as scrolledtext
 from tkinter import *
 from change_all_osu_backgrounds_to_img import change_backgrounds_selector
-    
+from typing import Callable
 #==========================ROOT==================================================
 root = CTk()
 root.resizable(False, False)
@@ -78,7 +78,26 @@ def change_background_to_img_confirm():
     ans = create_ask_window("Are you sure you want to change all the backgrounds to the selected image?","change background images?")
     if ans:
         
-        pass
+        try:
+            all_osu_map_folders = find_all_osu_maps_folders(osu_main_directory_var.get())
+            remove_bg_confirm(osu_main_directory_var)()
+            name, extension  = os.path.splitext(change_background_to_img_window.image_combobox.get())
+            path_to_img = f"{os.getcwd()}\\default backgrounds\\{change_background_to_img_window.image_combobox.get()}"
+            if not(name.endswith("osu!_background_(re)mover")):
+                path_to_img = f"{os.getcwd()}\\default backgrounds\\{name+"osu!_background_(re)mover"+extension}"
+                rename_image_to(f"{os.getcwd()}\\default backgrounds\\{change_background_to_img_window.image_combobox.get()}", name+"osu!_background_(re)mover")
+            copy_image_to_paths(path_to_img,all_osu_map_folders)
+            
+
+
+
+
+
+
+
+            
+        except Exception as error:
+            log([str(error)])
 
 
 change_background_to_img_window = change_backgrounds_selector
@@ -198,8 +217,13 @@ manual_search_button.grid(column=0,row=1,padx=20)
 #===========================Create the confirm button-----------------------------------------
 
 
-def remove_bg_confirm(var):
-    def wrapper():
+def remove_bg_confirm(var) -> Callable[[], bool]:
+    '''
+    takes in a StringVar() that stores the osu directory and removes or stores the images dependent on the save mode
+    if the images were saved successfuly the returned function returns True
+    otherwise False
+    '''
+    def wrapper() -> bool:
 
         try:
             if save_background_mode.get() and create_ask_window('Are you sure you want to move the files (They will be saved in a backed up backgrounds folder)', "remove the backgrounds?"):
@@ -212,9 +236,11 @@ def remove_bg_confirm(var):
             else:
                 remove_backgrounds_fully(get_background_images_paths(var.get()))
                 log(["ALL THE BACKGROUND IMAGES HAVE BEEN DELETED!"])
+            return True
         except Exception as error:
             messagebox.showerror("error",error)
             log([str(error)])
+            return False
     return wrapper
 
 confirm_the_removal = CTkButton(root,text="Confirm", command=remove_bg_confirm(osu_main_directory_var))
