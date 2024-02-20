@@ -1,4 +1,4 @@
-from background_remover_functions import remove_backgrounds_fully, os , find_directories, filedialog , messagebox , get_background_images_paths, shutil, copy_directories , create_ask_window, restore_bgs
+from background_remover_functions import remove_backgrounds_fully, os , find_directories, filedialog , messagebox , get_background_images_paths, shutil, copy_directories , create_ask_window, restore_bgs,find_all_osu_maps_folders
 from customtkinter import *
 import tkinter.scrolledtext as scrolledtext
 from tkinter import *
@@ -71,8 +71,20 @@ Deleting backgrounds permenantly:
 If you want to delete your backgrounds permenantly you can uncheck the 'Save backgrounds' from the settings. and proceed the same way as if you were saving the backgrounds.
 ''']
 ))
+#================A SEPERATE WINDOW FOR CHANGING BACKGROUNDS TO AN IMAGE=================
+
+def change_background_to_img_confirm():
+
+    ans = create_ask_window("Are you sure you want to change all the backgrounds to the selected image?","change background images?")
+    if ans:
+        
+        pass
+
+
+change_background_to_img_window = change_backgrounds_selector
 def open_change_background_selector() -> None:
-    change_backgrounds_selector()
+    global change_background_to_img_window
+    change_background_to_img_window =change_backgrounds_selector(change_background_to_img_confirm)
 menu.add_command(label="Change to selected background", command=open_change_background_selector)
 menu.add_cascade(menu=menu_cascade ,label='Settings')
 #=========================RESTORE BACKGROUNDS BUTTON==========================

@@ -105,7 +105,7 @@ def get_background_images_paths(the_osu_directory_path =None,ask_user = True)-> 
 
 
     for i in path_items_to_remove:
-        #remove images that are bigger than 100000 bytes (so that most of the time only background images get removed)
+        
         if (i[-4:] == ".png" or i[-4:]== ".jpg") :
                 
             #checks if the path exists and i is not "" just in case
@@ -195,6 +195,43 @@ def find_all_default_images_paths():
         if imghdr.what(path_to_default_bgs+"\\"+image):
 
             yield path_to_default_bgs+"\\"+image
+def find_all_default_images_names():
+    '''
+    Yields all of the images' names from default backgrounds
+    '''
+    path_to_default_bgs = os.getcwd()+r"\default backgrounds"
+    if not(os.path.exists(path_to_default_bgs )):
+        os.mkdir(path_to_default_bgs)
+    for image in os.listdir(path_to_default_bgs):
+        if imghdr.what(path_to_default_bgs+"\\"+image):
+
+            yield image
+def find_all_osu_maps_folders(osu_directory: str)-> list[str]:
+
+    
+    '''
+    takes in an a../osu!/Songs directoru path and returns every folder inside of the path
+    '''
+    
+    
+
+    #checks if the directory has osu! in the path just in case
+    if not(osu_directory) or ((osu_directory[-10:]!="osu!\\Songs")and (osu_directory[-10:]!="osu!/Songs")):
+        
+        raise(
+            Exception("The drectory you specified does not contain 'osu!/Songs in it. Please select one that does.\n (It is done for the safety of your files)")
+        )
+
+    
+    #get every ellement in the song directory (maps)
+    try:
+        every_map = os.listdir(osu_directory)
+    except:
+        raise (
+            Exception("this directory does not exist")
+            )
+    return every_map
+
 
 
         
