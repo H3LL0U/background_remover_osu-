@@ -36,7 +36,33 @@ def find_directories(root_dir, pattern, root)-> Generator[str, None, None] :
             yield dirpath
 
     
+def find_all_osu_maps_folders(osu_directory: str)-> list[str]:
 
+    
+    '''
+    takes in an a../osu!/Songs directory path and returns every folder inside of the path
+    '''
+    if not(os.path.exists(osu_directory)):
+        raise(Exception("The path specified does not exist"))
+    
+    
+
+    #checks if the directory has osu! in the path just in case
+    if not(osu_directory) or ((osu_directory[-10:]!="osu!\\Songs")and (osu_directory[-10:]!="osu!/Songs")):
+        
+        raise(
+            Exception("The drectory you specified does not contain 'osu!/Songs in it. Please select one that does.\n (It is done for the safety of your files)")
+        )
+
+    
+    #get every ellement in the song directory (maps)
+    try:
+        every_map = os.listdir(osu_directory)
+    except:
+        raise (
+            Exception("this directory does not exist")
+            )
+    return [f"{osu_directory}\\{i}".replace("\\",'/') for i in every_map if os.path.isdir(f"{osu_directory}\\{i}".replace("\\",'/'))]
         
 
 
@@ -46,36 +72,14 @@ def get_background_images_paths(the_osu_directory_path =None,ask_user = True)-> 
     takes in the osu!/Songs path returns the paths of the background-images 
     '''
     
-    if the_osu_directory_path is None:
-       the_osu_directory_path =filedialog.askdirectory(title="select the 'osu!/Songs' folder (from there all the images that are more than 100000 bytes will be removed)")
-    
-    #store the osu song directory
-    
-    osu_directory = the_osu_directory_path 
 
-    #checks if the directory has osu! in the path just in case
-    if not(osu_directory) or ((osu_directory[-10:]!="osu!\\Songs")and (osu_directory[-10:]!="osu!/Songs")):
-        
-        raise(
-            Exception("The drectory you specified does not contain 'osu!/Songs in it. Please select one that does.\n (It is done for the safety of your files)")
-        )
-
-    files_inside_the_folder = ""
-    #get every ellement in the song directory (maps)
-    try:
-        every_map = os.listdir(osu_directory)
-    except:
-        raise (
-            Exception("this directory does not exist")
-            )
-    #stores the paths of every folder with map's assets inside
-    every_map_path = [f"{osu_directory}/{i}" for i in every_map]
+    every_map_path = find_all_osu_maps_folders(the_osu_directory_path)
 
 
     #path to files to remove (the background images)
     try:
         path_items_to_remove = []
-        for folder in every_map_path[0:]:
+        for folder in every_map_path:
             
             files_inside_the_folder = os.listdir(folder)
             for item in files_inside_the_folder:
@@ -143,6 +147,7 @@ def copy_directories(iterable_with_paths,program_root_path = os.getcwd())-> None
         os.makedirs('backed up backgrounds')
     #Create the directories to store backgrounds: backed up backgrounds\mapname
     for image_path in iterable_with_paths:
+        create_config(os.path.dirname(image_path))
         if os.path.exists(backed_up_bg_dir):
             osu_map_name = os.path.basename(os.path.dirname(image_path))
             
@@ -155,6 +160,61 @@ def copy_directories(iterable_with_paths,program_root_path = os.getcwd())-> None
             if os.path.isfile(image_path):
 
                 shutil.move(image_path,backed_up_map_dir)
+
+def create_config(path_to_map_folder:str)-> str:
+    '''
+    takes in a path to the song folder and creates a config in the backed up backgrounds that stores the initial configuration
+    of the songs' background
+    returns a string which contains contents of the config
+    '''
+    if not(os.path.exists(path_to_map_folder)):
+        raise(Exception("The path to folder does not exist"))
+    if os.path.isdir(path_to_map_folder):
+        osu_map_files_paths = [f"{path_to_map_folder}/{i}" for i in os.listdir(path_to_map_folder) if i.endswith(".osu")]
+        contents_of_config =  ""
+        
+        for file_to_read in osu_map_files_paths:
+            found_background_part = False
+            contents_of_config+=f"{os.path.basename(file_to_read)}:\n"
+            
+            if os.path.exists(file_to_read):
+                
+                with open(file_to_read,"r", encoding='utf-8') as file:
+
+                    for line in file:
+                        
+                        if found_background_part and line.startswith("//"):
+                            break
+
+                        if found_background_part and not("osu!_background_(re)mover)" in line):
+                            contents_of_config+=f"{line}\n"
+                        
+                        if "//Background and Video events" in line:
+                            found_background_part = True
+    path_to_backed_up_bg = f"{os.getcwd()}/backed up backgrounds/{os.path.basename(path_to_map_folder)}"
+    if not(os.path.exists(path_to_backed_up_bg)):
+        os.makedirs(path_to_backed_up_bg)
+    with open(f"{path_to_backed_up_bg}/config.txt", "a+") as file:
+        file.seek(0)
+        read_lines = file.readlines()
+        lines_to_add = contents_of_config.split("\n")
+        file.write("\n")
+        for i in lines_to_add:
+            
+            if not(i+"\n" in read_lines) and i!="":
+                
+                file.write(i+"\n")
+            
+        
+
+    return contents_of_config
+
+
+    
+    
+
+
+
 
 
 def restore_bgs(osu_songs_dir, backed_up_bgs_dir) -> None:
@@ -170,7 +230,7 @@ def restore_bgs(osu_songs_dir, backed_up_bgs_dir) -> None:
         backed_up_dir_contents_paths = [backed_up_bgs_dir+'\\'+saved_map+'\\'+i for i in os.walk(backed_up_bgs_dir+'\\'+saved_map).__next__()[2]]
         
         for image_path in backed_up_dir_contents_paths:
-            if os.path.exists(osu_songs_dir+'\\'+saved_map):
+            if os.path.exists(osu_songs_dir+'\\'+saved_map) and not(image_path.endswith('.txt')):
 
                 shutil.move(image_path,osu_songs_dir+'\\'+saved_map)
             
@@ -206,31 +266,7 @@ def find_all_default_images_names():
         if imghdr.what(path_to_default_bgs+"\\"+image):
 
             yield image
-def find_all_osu_maps_folders(osu_directory: str)-> list[str]:
 
-    
-    '''
-    takes in an a../osu!/Songs directoru path and returns every folder inside of the path
-    '''
-    
-    
-
-    #checks if the directory has osu! in the path just in case
-    if not(osu_directory) or ((osu_directory[-10:]!="osu!\\Songs")and (osu_directory[-10:]!="osu!/Songs")):
-        
-        raise(
-            Exception("The drectory you specified does not contain 'osu!/Songs in it. Please select one that does.\n (It is done for the safety of your files)")
-        )
-
-    
-    #get every ellement in the song directory (maps)
-    try:
-        every_map = os.listdir(osu_directory)
-    except:
-        raise (
-            Exception("this directory does not exist")
-            )
-    return [f"{osu_directory}\\{i}".replace("\\",'/') for i in every_map]
 def rename_image_to(image_path: str, new_name: str) -> None:
     '''
     takes in an image path and changes the image's name to a new one without changing the extension
@@ -254,7 +290,7 @@ def copy_image_to_paths(image_path: str, new_dirs_with_image : list[str])-> None
     takes in image path to copy
     and new directories where the image will be copied to
 
-    outcome -> image is copied to these paths
+    outcome -> image is copied to these paths if they exist
     '''
     if os.path.exists(image_path):
         for i in new_dirs_with_image:
@@ -262,13 +298,9 @@ def copy_image_to_paths(image_path: str, new_dirs_with_image : list[str])-> None
 
 
                 shutil.copy2(image_path,i)
-            else:
-                raise(Exception("The path to New directory does not exist"))
+
     else:
         raise(Exception("The path of an image you selected does not exist"))
     
 
-
-
-        
 
