@@ -87,6 +87,7 @@ def change_background_to_img_confirm():
                 path_to_img = f"{os.getcwd()}\\default backgrounds\\{name+"osu!_background_(re)mover"+extension}"
                 rename_image_to(f"{os.getcwd()}\\default backgrounds\\{change_background_to_img_window.image_combobox.get()}", name+"osu!_background_(re)mover")
             copy_image_to_paths(path_to_img,all_osu_map_folders)
+            rename_image_to(path_to_img,name.replace("osu!_background_(re)mover",''))
             
 
 
@@ -227,7 +228,7 @@ def remove_bg_confirm(var) -> Callable[[], bool]:
 
         try:
             if save_background_mode.get() and create_ask_window('Are you sure you want to move the files (They will be saved in a backed up backgrounds folder)', "remove the backgrounds?"):
-                copy_directories(get_background_images_paths(var.get(),False))
+                copy_directories(root,get_background_images_paths(var.get(),False))
                 log(['ALL THE BACKGROUND IMAGES HAVE BEEN MOVED TO backed up backgrounds folder'])
             
             elif save_background_mode.get():

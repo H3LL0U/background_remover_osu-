@@ -6,7 +6,8 @@ from tkinter import *
 import shutil
 import imghdr
 from typing import Generator
-#ask user
+from customtkinter import CTk
+
 def create_ask_window(text_to_display = "", title = "remove the backgrounds") -> bool | None:
     '''
     Creates ask window
@@ -134,10 +135,11 @@ def remove_backgrounds_fully(iterable_with_paths) -> None:
 
 
     
-def copy_directories(iterable_with_paths,program_root_path = os.getcwd())-> None:
+def copy_directories(root: CTk ,iterable_with_paths,program_root_path = os.getcwd())-> None:
 
     '''
-    #Copies the names of the directories with map names from osu directory-----
+    takes in root to update and an iterable with paths from get_background_images_paths function
+    Copies the names of the directories with map names from osu directory to backed up backgrounds directory
     '''
     if iterable_with_paths.__name__ !="get_background_images_paths":
         raise(Exception("The iterable provided wasn't created by get_osu_backgrounds function"))
@@ -145,21 +147,28 @@ def copy_directories(iterable_with_paths,program_root_path = os.getcwd())-> None
 
     if not(os.path.exists(backed_up_bg_dir)):
         os.makedirs('backed up backgrounds')
-    #Create the directories to store backgrounds: backed up backgrounds\mapname
+    
+    
     for image_path in iterable_with_paths:
+        root.update()
+        #TODO: instead of creating a config on each file it should first loop through the osu songs directories for more effeciency
         create_config(os.path.dirname(image_path))
         if os.path.exists(backed_up_bg_dir):
             osu_map_name = os.path.basename(os.path.dirname(image_path))
-            
+            osu_map_name_no_extension , osu_map_name_extension = os.path.splitext(image_path)
             
             backed_up_map_dir = backed_up_bg_dir+'\\'+osu_map_name
             
             if not(os.path.exists(backed_up_map_dir)):
                 
                 os.makedirs(backed_up_map_dir)
-            if os.path.isfile(image_path):
-
+            if os.path.isfile(image_path) and not(osu_map_name_no_extension.endswith("osu!_background_(re)mover")):
+                
                 shutil.move(image_path,backed_up_map_dir)
+            if osu_map_name_no_extension.endswith("osu!_background_(re)mover"):
+                
+                os.remove(image_path)
+            
 
 def create_config(path_to_map_folder:str)-> str:
     '''
@@ -179,14 +188,14 @@ def create_config(path_to_map_folder:str)-> str:
             
             if os.path.exists(file_to_read):
                 
-                with open(file_to_read,"r", encoding='utf-8') as file:
+                with open(file_to_read,"r", encoding="cp437") as file:
 
                     for line in file:
                         
                         if found_background_part and line.startswith("//"):
                             break
 
-                        if found_background_part and not("osu!_background_(re)mover)" in line):
+                        if found_background_part and not("osu!_background_(re)mover" in line):
                             contents_of_config+=f"{line}\n"
                         
                         if "//Background and Video events" in line:
@@ -194,7 +203,7 @@ def create_config(path_to_map_folder:str)-> str:
     path_to_backed_up_bg = f"{os.getcwd()}/backed up backgrounds/{os.path.basename(path_to_map_folder)}"
     if not(os.path.exists(path_to_backed_up_bg)):
         os.makedirs(path_to_backed_up_bg)
-    with open(f"{path_to_backed_up_bg}/config.txt", "a+") as file:
+    with open(f"{path_to_backed_up_bg}/config.txt", "a+", encoding="cp437" ) as file:
         file.seek(0)
         read_lines = file.readlines()
         lines_to_add = contents_of_config.split("\n")
