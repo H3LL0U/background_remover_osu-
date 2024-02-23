@@ -73,20 +73,27 @@ If you want to delete your backgrounds permenantly you can uncheck the 'Save bac
 ))
 #================A SEPERATE WINDOW FOR CHANGING BACKGROUNDS TO AN IMAGE=================
 
-def change_background_to_img_confirm():
-
+def change_background_to_img_confirm() -> None:
+    '''
+    Changes the background images in all osu maps to the selected image
+    '''
     ans = create_ask_window("Are you sure you want to change all the backgrounds to the selected image?","change background images?")
     if ans:
         
         try:
+            
             all_osu_map_folders = find_all_osu_maps_folders(osu_main_directory_var.get())
             remove_bg_confirm(osu_main_directory_var)()
+            log(["All of the images are being replaced..."])
             name, extension  = os.path.splitext(change_background_to_img_window.image_combobox.get())
             path_to_img = f"{os.getcwd()}\\default backgrounds\\{change_background_to_img_window.image_combobox.get()}"
+            print(path_to_img)
             if not(name.endswith("osu!_background_(re)mover")):
                 path_to_img = f"{os.getcwd()}\\default backgrounds\\{name+"osu!_background_(re)mover"+extension}"
                 rename_image_to(f"{os.getcwd()}\\default backgrounds\\{change_background_to_img_window.image_combobox.get()}", name+"osu!_background_(re)mover")
+            print("before")
             copy_image_to_paths(path_to_img,all_osu_map_folders)
+            print("after")
             rename_image_to(path_to_img,name.replace("osu!_background_(re)mover",''))
             log([f"the backgrounds have been replaced with {change_background_to_img_window.image_combobox.get()}"])
 
@@ -98,6 +105,7 @@ def change_background_to_img_confirm():
 
             
         except Exception as error:
+            
             log([str(error)])
 
 

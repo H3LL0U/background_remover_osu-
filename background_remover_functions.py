@@ -300,13 +300,22 @@ def copy_image_to_paths(image_path: str, new_dirs_with_image : list[str])-> None
     and new directories where the image will be copied to
 
     outcome -> image is copied to these paths if they exist
+    outcome -> also changes all of the .osu files to have this image as background
     '''
     if os.path.exists(image_path):
-        for i in new_dirs_with_image:
-            if os.path.exists(i):
+        for dir in new_dirs_with_image:
+            
+            if os.path.exists(dir):
+                dir_contents_dot_osu_paths = [f"{dir}/{i}" for i in os.listdir(dir) if i.endswith(".osu")]
+                for file in dir_contents_dot_osu_paths:
+                    with open(file,'r', encoding="cp437") as dot_osu_file:
+                        lines = dot_osu_file.readlines()
+                    if lines:
+                        with open(file,'w', encoding='cp437') as dot_osu_file:
+                            dot_osu_file.writelines(change_dot_osu_file_background_text(lines,f'0,0,"{os.path.basename(image_path)}",0,0'))
+                
 
-
-                shutil.copy2(image_path,i)
+                shutil.copy2(image_path,dir)
 
     else:
         raise(Exception("The path of an image you selected does not exist"))
@@ -327,7 +336,8 @@ def change_dot_osu_file_background_text(old_lines:list[str],new_text:str) ->list
             count_idx = True
     
     new_lines = [line for idx,line in enumerate(old_lines) if not(idx in indexes_to_remove)]
-    new_lines.insert(indexes_to_remove[0],new_text+"\n")
+    if indexes_to_remove:
+        new_lines.insert(indexes_to_remove[0],new_text+"\n")
     return new_lines
 
 
