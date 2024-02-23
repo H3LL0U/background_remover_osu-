@@ -5,7 +5,7 @@ from customtkinter import CTkImage
 import tkinter.scrolledtext as scrolledtext
 from tkinter import *
 from PIL import Image
-
+from tkinter import filedialog
 class change_backgrounds_selector(CTkToplevel):
     '''
     Window for selecting and uploading default backgrounds to set in place of the old ones
@@ -30,8 +30,14 @@ class change_backgrounds_selector(CTkToplevel):
         
         
         self.image_combobox.pack(pady = 10)
-
-        self.confirm_select_button = CTkButton(self.main_frame,text="confirm", command= button_command)
+        def upload_image():
+            selected_files = filedialog.askopenfilenames(title="Choose images you want to upload")
+            for file in selected_files:
+                background_remover_functions.copy_image_to_default_images(file)
+            
+        self.upload_button = CTkButton(self.main_frame, text="Upload image", command=upload_image)
+        self.upload_button.pack(pady = 10)
+        self.confirm_select_button = CTkButton(self.main_frame,text="Confirm", command= button_command)
         self.confirm_select_button.pack(pady = 10)
         self.label_text_image = CTkLabel(self.main_frame, text="")
         self.label_text_image.pack(pady = 10, padx = 10)
