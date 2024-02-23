@@ -87,13 +87,13 @@ def change_background_to_img_confirm() -> None:
             log(["All of the images are being replaced..."])
             name, extension  = os.path.splitext(change_background_to_img_window.image_combobox.get())
             path_to_img = f"{os.getcwd()}\\default backgrounds\\{change_background_to_img_window.image_combobox.get()}"
-            print(path_to_img)
+            
             if not(name.endswith("osu!_background_(re)mover")):
                 path_to_img = f"{os.getcwd()}\\default backgrounds\\{name+"osu!_background_(re)mover"+extension}"
                 rename_image_to(f"{os.getcwd()}\\default backgrounds\\{change_background_to_img_window.image_combobox.get()}", name+"osu!_background_(re)mover")
-            print("before")
+            
             copy_image_to_paths(path_to_img,all_osu_map_folders)
-            print("after")
+            
             rename_image_to(path_to_img,name.replace("osu!_background_(re)mover",''))
             log([f"the backgrounds have been replaced with {change_background_to_img_window.image_combobox.get()}"])
 
@@ -109,10 +109,17 @@ def change_background_to_img_confirm() -> None:
             log([str(error)])
 
 
-change_background_to_img_window = change_backgrounds_selector
+change_background_to_img_window = None
 def open_change_background_selector() -> None:
     global change_background_to_img_window
-    change_background_to_img_window =change_backgrounds_selector(change_background_to_img_confirm)
+    try:
+        window_opened = change_background_to_img_window.winfo_exists()
+    except:
+        window_opened = False
+    if not window_opened:
+        change_background_to_img_window =change_backgrounds_selector(change_background_to_img_confirm)
+    else:
+        log(['You have already opened up a window'])
 menu.add_command(label="Change to selected background", command=open_change_background_selector)
 menu.add_cascade(menu=menu_cascade ,label='Settings')
 #=========================RESTORE BACKGROUNDS BUTTON==========================
