@@ -88,7 +88,7 @@ def change_background_to_img_confirm():
                 rename_image_to(f"{os.getcwd()}\\default backgrounds\\{change_background_to_img_window.image_combobox.get()}", name+"osu!_background_(re)mover")
             copy_image_to_paths(path_to_img,all_osu_map_folders)
             rename_image_to(path_to_img,name.replace("osu!_background_(re)mover",''))
-            
+            log([f"the backgrounds have been replaced with {change_background_to_img_window.image_combobox.get()}"])
 
 
 
@@ -111,7 +111,7 @@ menu.add_cascade(menu=menu_cascade ,label='Settings')
 
 def restoration():
     try:
-        ask_user = create_ask_window('Are you sure you want to restore the backgrounds you saved? to the selected osu!/Songs folder?')
+        ask_user = create_ask_window('Are you sure you want to restore the backgrounds you saved? to the selected osu!/Songs folder?', "restore backgrounds?")
         if ask_user:
             #checks if this directory can be considered as an osu dir
             list(get_background_images_paths(osu_main_directory_var.get(),False))

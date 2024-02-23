@@ -242,7 +242,7 @@ def restore_bgs(osu_songs_dir, backed_up_bgs_dir) -> None:
             if os.path.exists(osu_songs_dir+'\\'+saved_map) and not(image_path.endswith('.txt')):
 
                 shutil.move(image_path,osu_songs_dir+'\\'+saved_map)
-            
+                apply_config(saved_map,osu_songs_dir)
 def copy_image_to_default_images(image_path: str) -> None:
     '''
     copies an image from a selected path to default images that later can be selected as a replacement for all of the backgrounds
@@ -310,6 +310,70 @@ def copy_image_to_paths(image_path: str, new_dirs_with_image : list[str])-> None
 
     else:
         raise(Exception("The path of an image you selected does not exist"))
-    
 
+def change_dot_osu_file_background_text(old_lines:list[str],new_text:str) ->list[str]:
+    '''
+    Takes in a list of lines from the .osu! file and returns a new list of lines for //Background and Video events which the new 
+    .osu file should contain
+    '''
+    count_idx = False
+    indexes_to_remove = []
+    for idx, line in enumerate(old_lines):
+        if count_idx and not("//" in line):
+            indexes_to_remove.append(idx)
+        elif count_idx and ("//" in line or "[" in line):
+            break
+        if "//Background and Video events" in line:
+            count_idx = True
+    
+    new_lines = [line for idx,line in enumerate(old_lines) if not(idx in indexes_to_remove)]
+    new_lines.insert(indexes_to_remove[0],new_text+"\n")
+    return new_lines
+
+
+
+
+
+
+def apply_config(song_name, osu_songs_dir) -> None:
+    '''
+    Takes in a song name in the folder and osu!/Songs directory and applies an existing config
+    from backed up backgrounds folder
+    '''
+    path_to_config = f"{os.getcwd()}/backed up backgrounds/{song_name}/config.txt"
+
+
+
+
+    if os.path.exists(path_to_config):
+
+        with open(path_to_config, "r", encoding='cp437') as config:
+            current_dot_osu_file = ''
+            config_text = ''
+            for line in config:
+                
+                if current_dot_osu_file and not(line.endswith(".osu:\n")) and os.path.exists(current_dot_osu_file):
+                    
+                    config_text += line 
+                    
+                elif current_dot_osu_file and line.endswith(".osu:\n") and os.path.exists(current_dot_osu_file):
+                    
+                    with open(current_dot_osu_file,'r', encoding="cp437") as osu_file:
+                        osu_file_lines = osu_file.readlines()
+                    with open(current_dot_osu_file,'w', encoding="cp437") as osu_file:
+                        osu_file.writelines(change_dot_osu_file_background_text(osu_file_lines,config_text))
+                        config_text = ''
+
+                if line == '\n':
+                    
+                    continue
+                if line.endswith(".osu:\n"):
+                    
+                    current_dot_osu_file = f"{osu_songs_dir}/{song_name}/{line[:-2]}"
+    if os.path.exists(path_to_config):
+        os.remove(path_to_config)
+
+
+
+            
 

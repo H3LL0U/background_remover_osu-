@@ -15,7 +15,7 @@ class change_backgrounds_selector(CTkToplevel):
         self.resizable(False,False)
         self.main_frame = CTkFrame(self)
         self.main_frame.pack()
-        
+        self.title("Change backgrounds to image")
         self.label = CTkLabel(self.main_frame,text="Select an image to replace all your backgrounds with")
         self.label.pack(pady = 10,padx = 10)
         self.image_combobox_var = list(background_remover_functions.find_all_default_images_names())
