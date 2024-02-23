@@ -25,11 +25,21 @@ class change_backgrounds_selector(CTkToplevel):
             new_image = CTkImage(Image.open(image_path),size=(250,250))
             self.image_label.configure(image=new_image)
             self.label_text_image.configure(text = image_selected)
-            
-        self.image_combobox = CTkComboBox(master=self.main_frame,values=self.image_combobox_var, state='readonly', command=on_image_select)
+        self.image_combobox_frame = CTkFrame(self.main_frame)
+        self.image_combobox_frame.pack(pady = 10)
+        self.image_combobox = CTkComboBox(master=self.image_combobox_frame,values=self.image_combobox_var, state='readonly', command=on_image_select)
         
         
-        self.image_combobox.pack(pady = 10)
+        self.image_combobox.grid(column = 0,row = 0)
+
+        def refresh():
+        
+            self.image_combobox_var = list(background_remover_functions.find_all_default_images_names())
+            self.image_combobox.configure(values = self.image_combobox_var )
+
+        self.refresh_button = CTkButton(self.image_combobox_frame,width=28, text="⟳", command=refresh)
+        self.refresh_button.grid(column=1,row = 0, padx = 5)
+
         def upload_image():
             selected_files = filedialog.askopenfilenames(title="Choose images you want to upload")
             for file in selected_files:
