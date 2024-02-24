@@ -1,0 +1,8 @@
+
+.new label - run dev -- -u (TWEEKER) [6426225^2-(sqrt(6421156)+6426154^2+912513839+267x9)-1].osu:
+.new label - run dev -- -u (TWEEKER) [Atlust's Extra^3].osu:
+.new label - run dev -- -u (TWEEKER) [bgm's Extra^2].osu:
+.new label - run dev -- -u (TWEEKER) [e^JBlue's Hard].osu:
+.new label - run dev -- -u (TWEEKER) [log6(lkx_Shore's Normal)].osu:
+.new label - run dev -- -u (TWEEKER) [Patchouli-R's Lunatic^2].osu:
+.new label - run dev -- -u (TWEEKER) [sqrt(Lunatic)].osu:
