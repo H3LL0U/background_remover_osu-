@@ -8,6 +8,7 @@ from change_all_osu_backgrounds_to_img import change_backgrounds_selector
 from typing import *
 from typing import Any, Tuple
 
+from widget_methods import Widget_methods
 
 #==========================ROOT==================================================
 
@@ -88,12 +89,13 @@ class LogSpace(CTkFrame):
         self.Log_textarea.delete(0.0,END)
         self.Log_textarea.configure(state=DISABLED)
 
-class PathFinder(CTkFrame):
+class PathFinder(CTkFrame, Widget_methods):
 
-    def __init__(self, master: Any, osu_main_directory_entry:MainEntry, logarea:LogSpace, menu, width: int = 200, height: int = 200, corner_radius: int | str | None = None, border_width: int | str | None = None, bg_color: str | Tuple[str, str] = "transparent", fg_color: str | Tuple[str, str] | None = None, border_color: str | Tuple[str, str] | None = None, background_corner_colors: Tuple[str | Tuple[str, str]] | None = None, overwrite_preferred_drawing_method: str | None = None, **kwargs):
-        self.logarea = logarea
+    def __init__(self, master: Any, osu_main_directory_entry:MainEntry, log_area:LogSpace, menu, width: int = 200, height: int = 200, corner_radius: int | str | None = None, border_width: int | str | None = None, bg_color: str | Tuple[str, str] = "transparent", fg_color: str | Tuple[str, str] | None = None, border_color: str | Tuple[str, str] | None = None, background_corner_colors: Tuple[str | Tuple[str, str]] | None = None, overwrite_preferred_drawing_method: str | None = None, **kwargs):
+        self.log_area = log_area
         self.menu = menu
         self.osu_main_directory_entry = osu_main_directory_entry
+        self.main_entry = osu_main_directory_entry
         super().__init__(master, width, height, corner_radius, border_width, bg_color, fg_color, border_color, background_corner_colors, overwrite_preferred_drawing_method, **kwargs)
         #======================search through the directories to find the location that has osu!/Songs at the end (see AUTO SEARCH)========================
         self.possible_directory = []
@@ -136,34 +138,7 @@ class PathFinder(CTkFrame):
         self.confirm_the_removal = CTkButton(self,text="Confirm", command=self.remove_bg_confirm(osu_main_directory_entry.osu_main_directory_var))
         self.confirm_the_removal.pack()
         
-    def log(self,text_to_add = []):
-        self.logarea.log(text_to_add)
-    def remove_bg_confirm(self,var) -> Callable[[], bool]:
-        '''
-        takes in a StringVar() that stores the osu directory and removes or stores the images dependent on the save mode
-        if the images were saved successfuly the returned function returns True
-        otherwise False
-        '''
-        
-        def wrapper() -> bool:
 
-            try:
-                if self.menu.save_background_mode.get() and create_ask_window('Are you sure you want to move the files (They will be saved in a backed up backgrounds folder)', "remove the backgrounds?"):
-                    copy_directories(self.winfo_toplevel(),get_background_images_paths(var.get(),False))
-                    self.log(['ALL THE BACKGROUND IMAGES HAVE BEEN MOVED TO backed up backgrounds folder'])
-                    
-                elif self.menu.save_background_mode.get():
-                    raise(Exception('The moving of the background images has been canceled'))
-                else:
-                    remove_backgrounds_fully(get_background_images_paths(var.get()))
-                    self.log(["ALL THE BACKGROUND IMAGES HAVE BEEN DELETED!"])
-                return True
-            except Exception as error:
-                messagebox.showerror("error",error)
-                self.log([str(error)])
-                return False
-            
-        return wrapper
 
 
     def find_next_possible_location(self):
@@ -228,10 +203,10 @@ class PathFinder(CTkFrame):
 
 
 
-class CustomMenuPart(Menu):
+class CustomMenuPart(Menu, Widget_methods):
     
-    def __init__(self, logarea:LogSpace ,main_entry, pathfinder, root: Misc | None = None, activebackground: str = ..., activeborderwidth: str | float = ..., activeforeground: str = ..., background: str = ..., bd: str | float = ..., bg: str = ..., border: str | float = ..., borderwidth: str | float = ..., cursor: str | tuple[str] | tuple[str, str] | tuple[str, str, str] | tuple[str, str, str, str] = ..., disabledforeground: str = ..., fg: str = ..., foreground: str = ..., name: str = ..., postcommand: Callable[[], object] | str = ..., relief: Literal['raised', 'sunken', 'flat', 'ridge', 'solid', 'groove'] = ..., selectcolor: str = ..., takefocus: int | Callable[[str], bool | None] | Literal[''] = ..., tearoff: int = ..., tearoffcommand: Callable[[str, str], object] | str = ..., title: str = ..., type: Literal['menubar', 'tearoff', 'normal'] = ...) -> None:
-        self.logarea = logarea
+    def __init__(self, log_area:LogSpace ,main_entry, pathfinder, root: Misc | None = None, activebackground: str = ..., activeborderwidth: str | float = ..., activeforeground: str = ..., background: str = ..., bd: str | float = ..., bg: str = ..., border: str | float = ..., borderwidth: str | float = ..., cursor: str | tuple[str] | tuple[str, str] | tuple[str, str, str] | tuple[str, str, str, str] = ..., disabledforeground: str = ..., fg: str = ..., foreground: str = ..., name: str = ..., postcommand: Callable[[], object] | str = ..., relief: Literal['raised', 'sunken', 'flat', 'ridge', 'solid', 'groove'] = ..., selectcolor: str = ..., takefocus: int | Callable[[str], bool | None] | Literal[''] = ..., tearoff: int = ..., tearoffcommand: Callable[[str, str], object] | str = ..., title: str = ..., type: Literal['menubar', 'tearoff', 'normal'] = ...) -> None:
+        self.log_area = log_area
         self.main_entry = main_entry
         self.pathfinder = pathfinder
         super().__init__(root,tearoff=tearoff)
@@ -301,7 +276,7 @@ class CustomMenuPart(Menu):
         except:
             window_opened = False
         if not window_opened:
-            self.change_background_to_img_window =change_backgrounds_selector(self.pathfinder,self.main_entry,self.logarea,self)
+            self.change_background_to_img_window =change_backgrounds_selector(self.pathfinder,self.main_entry,self.log_area,self)
         else:
             self.log(['You have already opened up a window'])
     def change_visual_mode(self):
@@ -328,6 +303,3 @@ class CustomMenuPart(Menu):
 
 
 
-
-    def log(self,text_to_add = []):
-        self.logarea.log(text_to_add)

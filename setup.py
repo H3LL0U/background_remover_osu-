@@ -8,7 +8,7 @@ executables = [
     Executable('main.py', base=base)
 ]
 
-setup(name = 'Osu! background remover', version = '1.2.0' , description = 'with this program you can delete and save all the unwanted osu! backgrounds from all the osu! folders. And restore them if you want to get them back',
+setup(name = 'Osu! background remover', version = '1.5.0' , description = 'with this program you can delete and save all the unwanted osu! backgrounds from all the osu! folders. And restore them if you want to get them back, also you will be able to change the backgrounds to any image you want',
       options = {'build_exe':build_options},
       executables = executables
       )

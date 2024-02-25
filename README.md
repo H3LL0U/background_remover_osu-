@@ -18,7 +18,7 @@ If you want to delete your backgrounds permenantly you can uncheck the 'Save bac
 
 
 
-#Used libraries:
+#Dependencies
 customtkinter 5.2.2
 cx_Freeze     6.16.0.dev38
 cx_Logging    3.1.0

@@ -135,24 +135,28 @@ def remove_backgrounds_fully(iterable_with_paths) -> None:
 
 
     
-def copy_directories(root: CTk ,iterable_with_paths,program_root_path = os.getcwd())-> None:
+def copy_directories(root: CTk ,iterable_with_paths,osu_dir =None)-> None:
 
     '''
     takes in root to update and an iterable with paths from get_background_images_paths function
     Copies the names of the directories with map names from osu directory to backed up backgrounds directory
+    if you want to create configs upon copying you can specify osu!/Songs dir
     '''
+    program_root_path = os.getcwd()
     if iterable_with_paths.__name__ !="get_background_images_paths":
         raise(Exception("The iterable provided wasn't created by get_osu_backgrounds function"))
     backed_up_bg_dir = program_root_path+"\\backed up backgrounds"
 
     if not(os.path.exists(backed_up_bg_dir)):
         os.makedirs('backed up backgrounds')
-    
-    
+    if osu_dir:
+        all_osu_songs_dir = find_all_osu_maps_folders(osu_dir)
+        for folder in all_osu_songs_dir:
+            create_config(folder)
+            root.update()
     for image_path in iterable_with_paths:
         root.update()
-        #TODO: instead of creating a config on each file it should first loop through the osu songs directories for more effeciency
-        create_config(os.path.dirname(image_path))
+
         if os.path.exists(backed_up_bg_dir):
             osu_map_name = os.path.basename(os.path.dirname(image_path))
             osu_map_name_no_extension , osu_map_name_extension = os.path.splitext(image_path)
@@ -327,6 +331,7 @@ def change_dot_osu_file_background_text(old_lines:list[str],new_text:str) ->list
     '''
     count_idx = False
     indexes_to_remove = []
+    start_index = None
     for idx, line in enumerate(old_lines):
         if count_idx and not("//" in line):
             indexes_to_remove.append(idx)
@@ -334,10 +339,11 @@ def change_dot_osu_file_background_text(old_lines:list[str],new_text:str) ->list
             break
         if "//Background and Video events" in line:
             count_idx = True
+            start_index = idx
     
     new_lines = [line for idx,line in enumerate(old_lines) if not(idx in indexes_to_remove)]
-    if indexes_to_remove:
-        new_lines.insert(indexes_to_remove[0],new_text+"\n")
+    if start_index:
+        new_lines.insert(start_index+1,new_text)
     return new_lines
 
 
@@ -361,28 +367,35 @@ def apply_config(song_name, osu_songs_dir) -> None:
             current_dot_osu_file = ''
             config_text = ''
             for line in config:
-                
+                if line == '\n':
+                    
+                    continue
                 if current_dot_osu_file and not(line.endswith(".osu:\n")) and os.path.exists(current_dot_osu_file):
                     
                     config_text += line 
                     
-                elif current_dot_osu_file and line.endswith(".osu:\n") and os.path.exists(current_dot_osu_file):
+                elif current_dot_osu_file and line.endswith(".osu:\n")  and os.path.exists(current_dot_osu_file):
                     
+                        
                     with open(current_dot_osu_file,'r', encoding="cp437") as osu_file:
                         osu_file_lines = osu_file.readlines()
                     with open(current_dot_osu_file,'w', encoding="cp437") as osu_file:
                         osu_file.writelines(change_dot_osu_file_background_text(osu_file_lines,config_text))
                         config_text = ''
+                
 
-                if line == '\n':
-                    
-                    continue
                 if line.endswith(".osu:\n"):
                     
                     current_dot_osu_file = f"{osu_songs_dir}/{song_name}/{line[:-2]}"
+            #apply for the last file
+            if config_text and current_dot_osu_file:
+                with open(current_dot_osu_file,'r', encoding="cp437") as osu_file:
+                    osu_file_lines = osu_file.readlines()
+                with open(current_dot_osu_file,'w', encoding="cp437") as osu_file:
+                    osu_file.writelines(change_dot_osu_file_background_text(osu_file_lines,config_text))
+                    config_text = ''
     if os.path.exists(path_to_config):
         os.remove(path_to_config)
-
 
 
             
