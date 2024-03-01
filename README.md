@@ -14,7 +14,10 @@ Congratulations! All of the backgrounds have been moved to the backed up backgro
 If you want to restore your backgrounds that you previously saved you can select your osu!/Songs folder once again and press 'restore backgrounds' in the upper menu. After confirming the backgrounds will be back for each song that you have previously saved!
 
 If you want to delete your backgrounds permenantly you can uncheck the 'Save backgrounds' from the settings. and proceed the same way as if you were saving the backgrounds.
-(See #TODO and #Known issues for more information or contact me using the contacts bellow :D)
+(See WiKi for more information or contact me using the contacts bellow :D)
+
+LINK TO DOWNLOADABLE EXE:
+https://www.dropbox.com/scl/fi/xt42zc6skpuhvsmr5sue3/osu-Background-re-mover-ver-1.5.zip?rlkey=o99u9v2nh0to0oc12o4twe7d8&dl=0
 
 
 
