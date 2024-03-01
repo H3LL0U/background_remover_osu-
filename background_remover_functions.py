@@ -343,7 +343,7 @@ def change_dot_osu_file_background_text(old_lines:list[str],new_text:str) ->list
     
     new_lines = [line for idx,line in enumerate(old_lines) if not(idx in indexes_to_remove)]
     if start_index:
-        new_lines.insert(start_index+1,new_text)
+        new_lines.insert(start_index+1,(new_text+"\n").replace("\n\n","\n"))
     return new_lines
 
 
