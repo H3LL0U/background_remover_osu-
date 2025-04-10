@@ -1,3 +1,5 @@
+# Osu! Background remover
+
 Were you wondering how you can remove the backgrounds entirely from all the maps in osu! ?
 
 This program can help you fix this issue by (at the moment) deleting all the background images from all the map folders that you have.
