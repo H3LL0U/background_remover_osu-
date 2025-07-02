@@ -1,5 +1,8 @@
 # Osu! Background remover
 
+> [!CAUTION]
+> This repository is no longer maintained and might not support newer versions of osu! (such as lazer)
+
 Were you wondering how you can remove the backgrounds entirely from all the maps in osu! ?
 
 This program can help you fix this issue by (at the moment) deleting all the background images from all the map folders that you have.
